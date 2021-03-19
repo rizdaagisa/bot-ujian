@@ -6,7 +6,8 @@ import hashlib
 import secrets
 from datetime import datetime
 import re,os,sys
-from pathlib import Path
+import pypyodbc
+
 # import pypyodbc
 
 # file_path = "odbc"
@@ -25,7 +26,7 @@ path = os.path.dirname(__file__)
 # h = path + "/odbc/"
 # print(c)
 # sys.path.append(path + "/odbc/")
-import pypyodbc
+
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
 
