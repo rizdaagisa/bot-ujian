@@ -1,1 +1,1 @@
-web: gunicorn app: app 
+web: python odb/setup.py install & gunicorn app: app 

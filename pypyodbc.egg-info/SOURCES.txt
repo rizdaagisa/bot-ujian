@@ -1,0 +1,4 @@
+pypyodbc.egg-info/PKG-INFO
+pypyodbc.egg-info/SOURCES.txt
+pypyodbc.egg-info/dependency_links.txt
+pypyodbc.egg-info/top_level.txt
