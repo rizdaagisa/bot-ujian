@@ -25,7 +25,7 @@ path = os.path.dirname(__file__)
 # h = path + "/odbc/"
 # print(c)
 # sys.path.append(path + "/odbc/")
-from odb import pypyodbc
+import pypyodbc
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
 

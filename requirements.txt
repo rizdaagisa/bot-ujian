@@ -1,3 +1,4 @@
+pypyodbc
 beautifulsoup4==4.9.3
 bs4==0.0.1
 cryptography==3.3.1
