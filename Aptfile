@@ -1,5 +1,1 @@
-https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/msodbcsql17/msodbcsql17_17.0.1.1-1_amd64.deb
-https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-tools/mssql-tools_17.0.1.1-1_amd64.deb
-https://packages.microsoft.com/ubuntu/14.04/prod/pool/main/m/mssql-cli/mssql-cli_0.15.0-1_all.deb
-unixodbc
 unixodbc-dev
