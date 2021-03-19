@@ -6,7 +6,7 @@ import hashlib
 import secrets
 from datetime import datetime
 import re,os,sys
-import pypyodbc
+from odb import pypyodbc
 
 # import pypyodbc
 
