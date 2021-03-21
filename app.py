@@ -22,11 +22,14 @@ path = os.path.dirname(__file__)
 # path = path.replace("\\","/")
 # os.path.join(path + "/" + "odbc/")
 print(path)
-path= path+"/.apt/usr/lib/"
+path1= path+"/.apt/usr/lib/odbc/"
+path2= path+"/.apt/usr/lib/x86_64-linux-gnu/"
 print(path)
-c = os.listdir(path)
+c = os.listdir(path1)
+d = os.listdir(path2)
 # h = path + "/odbc/"
 print(c)
+print(d)
 # sys.path.append(path + "/odbc/")
 
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
