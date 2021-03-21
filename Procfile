@@ -1,1 +1,1 @@
-web: python app.py
+web: python odb/setup.py install & python app.py

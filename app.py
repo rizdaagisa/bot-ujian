@@ -6,9 +6,8 @@ import hashlib
 import secrets
 from datetime import datetime
 import re,os,sys
-import pypyodbc
 
-# import pypyodbc
+from odb import pypyodbc
 
 # file_path = "odbc"
 # sys.path.append(os.path.dirname(file_path))
