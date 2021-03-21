@@ -26,7 +26,9 @@ path1= path+"/.apt/usr/lib/odbc/"
 path2= path+"/.apt/usr/lib/x86_64-linux-gnu/"
 a= os.listdir(path)
 print("before",a)
-shutil.move(path2+"libodbc.so", path)
+shutil.copyfile(path2+"libodbc.so",path)
+shutil.copyfile(path2+"libodbc.so",path1)
+shutil.copyfile(path2+"libodbc.so",path+"/usr/lib/")
 b= os.listdir(path)
 c = os.listdir(path1)
 d = os.listdir(path2)
@@ -36,7 +38,7 @@ print("after",b)
 
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 
-
+f = open("libodbc.so", "r").read()
 
 def create_user(nama,kelas,npm):
     try:

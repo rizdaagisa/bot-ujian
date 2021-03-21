@@ -434,7 +434,7 @@ else:
             # If find_library still can not find the library
             # we try finding it manually from where libodbc.so usually appears
             # lib_paths = ("/usr/lib/libodbc.so","/usr/lib/i386-linux-gnu/libodbc.so","/usr/lib/x86_64-linux-gnu/libodbc.so","/usr/lib/libiodbc.dylib")
-            lib_paths = ("/usr/lib/libodbc.so","/usr/lib/i386-linux-gnu/libodbc.so","/usr/lib/x86_64-linux-gnu/libodbc.so.2","/usr/lib/libiodbc.dylib")
+            lib_paths = ("/usr/lib/libodbc.so","/usr/lib/i386-linux-gnu/libodbc.so","/usr/lib/x86_64-linux-gnu/libodbc.so","/usr/lib/libiodbc.dylib")
             lib_paths = [path for path in lib_paths if os.path.exists(path)]
             if len(lib_paths) == 0 :
                 raise OdbcNoLibrary('ODBC Library is not found. Is LD_LIBRARY_PATH set?')
@@ -2764,6 +2764,7 @@ def drivers():
         DriverList.append(DriverDescription.value)
         if Direction == SQL_FETCH_FIRST:
             Direction = SQL_FETCH_NEXT
+    print("\n\n",DriverList)
     return DriverList
         
 def get_mdb_driver():
@@ -2771,6 +2772,7 @@ def get_mdb_driver():
         raise Exception('This function is available for use in Windows only.')
     
     mdb_driver = [d for d in drivers() if 'Microsoft Access Driver (*.mdb' in d]
+    print("\n\n",mdb_driver,"\n\n")
     if mdb_driver == []:
         raise Exception('Access Driver is not found.')
     else:
