@@ -6,6 +6,7 @@ import hashlib
 import secrets
 from datetime import datetime
 import re,os,sys
+import shutil
 
 from odb import pypyodbc
 
@@ -23,10 +24,14 @@ path = os.path.dirname(__file__)
 # os.path.join(path + "/" + "odbc/")
 path1= path+"/.apt/usr/lib/odbc/"
 path2= path+"/.apt/usr/lib/x86_64-linux-gnu/"
-print(path)
+a= os.listdir(path)
+shutil.move(path2+"libodbc.so", path)
+print(a,path)
+b= os.listdir(path)
 c = os.listdir(path1)
 d = os.listdir(path2)
 # h = path + "/odbc/"
+print(a)
 print("odbc",c)
 print("linux-gnu",d)
 # sys.path.append(path + "/odbc/")
