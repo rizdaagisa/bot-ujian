@@ -7,8 +7,7 @@ import secrets
 from datetime import datetime
 import re,os,sys
 import shutil
-
-from odb import pypyodbc
+import pypyodbc
 
 # file_path = "odbc"
 # sys.path.append(os.path.dirname(file_path))
