@@ -5,7 +5,7 @@
 
 # The MIT License (MIT)
 #
-# Copyright (c) 2014 Henry Zhou <jiangwen365@gmail.com> and PyPyODBC contributors
+# Copyright (c) 2017 Henry Zhou <jiangwen365@gmail.com> and PyPyODBC contributors
 # Copyright (c) 2004 Michele Petrazzo
 
 # Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated 
@@ -26,8 +26,7 @@ pooling = True
 apilevel = '2.0'
 paramstyle = 'qmark'
 threadsafety = 1
-version = '1.3.5'
-lowercase=True
+version = '1.3.6'
 
 DEBUG = 0
 # Comment out all "if DEBUG:" statements like below for production
@@ -589,13 +588,13 @@ def dttm_cvt(x):
     if py_v3:
         x = x.decode('ascii')
     if x == '': return None
-    else: return datetime.datetime(int(x[0:4]),int(x[5:7]),int(x[8:10]),int(x[10:13]),int(x[14:16]),int(x[17:19]),int(x[20:].ljust(6,'0')))
+    else: return datetime.datetime(int(x[0:4]),int(x[5:7]),int(x[8:10]),int(x[10:13]),int(x[14:16]),int(x[17:19]),int(x[20:26].ljust(6,'0')[:6]))
 
 def tm_cvt(x):
     if py_v3:
         x = x.decode('ascii')
     if x == '': return None
-    else: return datetime.time(int(x[0:2]),int(x[3:5]),int(x[6:8]),int(x[9:].ljust(6,'0')))
+    else: return datetime.time(int(x[0:2]),int(x[3:5]),int(x[6:8]),int(x[9:].ljust(6,'0')[:6]))
 
 def dt_cvt(x):
     if py_v3:
@@ -640,7 +639,7 @@ SQL_TINYINT         : (int,                 int,                        SQL_C_CH
 SQL_BIT             : (bool,                lambda x:x == BYTE_1,       SQL_C_CHAR,         create_buffer,      2     ,         False         ),
 SQL_WCHAR           : (unicode,             lambda x: x,                SQL_C_WCHAR,        create_buffer_u,    2048  ,         False          ),
 SQL_WVARCHAR        : (unicode,             lambda x: x,                SQL_C_WCHAR,        create_buffer_u,    2048  ,         False          ),
-SQL_GUID            : (str,                 str,                        SQL_C_CHAR,         create_buffer,      2048  ,         False         ),
+SQL_GUID            : (str,                 lambda x: x,                SQL_C_CHAR,         create_buffer,      2048  ,         False         ),
 SQL_WLONGVARCHAR    : (unicode,             lambda x: x,                SQL_C_WCHAR,        create_buffer_u,    20500 ,         True          ),
 SQL_TYPE_DATE       : (datetime.date,       dt_cvt,                     SQL_C_CHAR,         create_buffer,      30    ,         False         ),
 SQL_TYPE_TIME       : (datetime.time,       tm_cvt,                     SQL_C_CHAR,         create_buffer,      20    ,         False         ),
@@ -1049,10 +1048,14 @@ def TupleRow(cursor):
         
         def get(self, field):
             if not hasattr(self, 'field_dict'):
-                self.field_dict = {}
-                for i,item in enumerate(self):
-                    self.field_dict[self.cursor_description[i][0]] = item
+                self.field_dict = self.to_dict()
             return self.field_dict.get(field)
+
+        def to_dict(self):
+            return {
+                self.cursor_description[i][0]: item
+                for i, item in enumerate(self)
+            }
             
         def __getitem__(self, field):
             if isinstance(field, (unicode,str)):
@@ -1070,7 +1073,7 @@ def NamedTupleRow(cursor):
     """
     from collections import namedtuple
 
-    attr_names = [x[0] for x in cursor._ColBufferList]
+    attr_names = [x[0] for x in cursor.description]
 
     class Row(namedtuple('Row', attr_names, rename=True)):
         cursor_description = cursor.description
@@ -1089,7 +1092,7 @@ def MutableNamedTupleRow(cursor):
     """
     from recordtype import recordtype
 
-    attr_names = [x[0] for x in cursor._ColBufferList]
+    attr_names = [x[0] for x in cursor.description]
 
     class Row(recordtype('Row', attr_names, rename=True)):
         cursor_description = cursor.description
@@ -1130,7 +1133,8 @@ def get_type(v):
         return ('b',)
     elif isinstance(v, unicode):
         if len(v) >= 255:
-            return  ('U',(len(v)//1000+1)*1000)
+            # use num of chars times 2 since utf-16-le encoding will double the number of bytes needed
+            return  ('U',(len(v)//1000+1)*1000*2)
         else:
             return ('u',)
     elif isinstance(v, (str_8b,str)):
@@ -1169,7 +1173,7 @@ def get_type(v):
 
 # The Cursor Class.
 class Cursor:
-    def __init__(self, conx, row_type_callable=None):
+    def __init__(self, conx, row_type_callable=None, lowercase=True):
         """ Initialize self.stmt_h, which is the handle of a statement
         A statement is actually the basis of a python"cursor" object
         """
@@ -1197,7 +1201,8 @@ class Cursor:
         if self.timeout != 0:
             self.set_timeout(self.timeout)
         self._PARAM_SQL_TYPE_LIST = []
-        self.closed = False      
+        self.closed = False
+        self.lowercase = lowercase
 
     def set_timeout(self, timeout):
         self.timeout = timeout
@@ -1212,7 +1217,7 @@ class Cursor:
         if not self.connection:
             self.close()
             
-        if type(query_string) == unicode:
+        if isinstance(query_string, unicode):
             c_query_string = wchar_pointer(UCS_buf(query_string))
             ret = ODBC_API.SQLPrepareW(self.stmt_h, c_query_string, len(query_string))
         else:
@@ -1296,7 +1301,8 @@ class Cursor:
             if param_types[col_num][0] == 'u':
                 sql_c_type = SQL_C_WCHAR
                 sql_type = SQL_WVARCHAR 
-                buf_size = 255                 
+                # allocate two bytes for each char due to utf-16-le encoding
+                buf_size = 255 * 2
                 ParameterBuffer = create_buffer_u(buf_size)                
                     
             elif param_types[col_num][0] == 's':
@@ -1344,8 +1350,15 @@ class Cursor:
                 digit_num, dec_num = param_types[col_num][1]
                 if dec_num > 0:
                     # has decimal
-                    buf_size = digit_num 
-                    dec_num = dec_num
+                    # 1.23 as_tuple -> (1,2,3),-2 
+                    # 1.23 digit_num = 3 dec_num = 2
+                    # 0.11 digit_num = 2 dec_num = 2
+                    # 0.01 digit_num = 1 dec_num = 2
+                    if dec_num > digit_num:
+                        buf_size = dec_num
+                    else:
+                        buf_size = digit_num
+                        #dec_num = dec_num
                 else:
                     # no decimal
                     buf_size = digit_num - dec_num 
@@ -1575,13 +1588,15 @@ class Cursor:
                     digit_num, dec_num = param_types[col_num][1]
                     if dec_num > 0:
                         # has decimal
+                        # 1.12 digit_num = 3 dec_num = 2
+                        # 0.11 digit_num = 2 dec_num = 2 
+                        # 0.01 digit_num = 1 dec_num = 2
                         left_part = digit_string[:digit_num - dec_num]
-                        right_part = digit_string[0-dec_num:]
+                        right_part = digit_string[0-dec_num:].zfill(dec_num)
+                        v = ''.join((sign, left_part,'.', right_part))
                     else:
                         # no decimal
-                        left_part = digit_string + '0'*(0-dec_num)
-                        right_part = ''
-                    v = ''.join((sign, left_part,'.', right_part))
+                        v = ''.join((digit_string, '0' * (0 - dec_num)))
 
                     if py_v3:
                         c_char_buf = bytes(v,'ascii')
@@ -1643,7 +1658,7 @@ class Cursor:
         self._free_stmt()
         self._last_param_types = None
         self.statement = None
-        if type(query_string) == unicode:
+        if isinstance(query_string, unicode):
             c_query_string = wchar_pointer(UCS_buf(query_string))
             ret = ODBC_API.SQLExecDirectW(self.stmt_h, c_query_string, len(query_string))
         else:
@@ -1789,7 +1804,7 @@ class Cursor:
                     check_success(self, ret)
             
             col_name = from_buffer_u(Cname)
-            if lowercase:
+            if self.lowercase:
                 col_name = col_name.lower()
             #(name, type_code, display_size, 
 
@@ -1887,9 +1902,11 @@ class Cursor:
                                 if target_type == SQL_C_BINARY:
                                     value_list.append(buf_cvt_func(alloc_buffer.raw[:used_buf_len.value]))
                                 elif target_type == SQL_C_WCHAR:
+                                    if used_buf_len.value < total_buf_len:
+                                        ctypes.memset(ctypes.addressof(alloc_buffer) + used_buf_len.value, 0, 1)
                                     value_list.append(buf_cvt_func(from_buffer_u(alloc_buffer)))
                                 elif alloc_buffer.value == '':
-                                    value_list.append(None)
+                                    value_list.append('')
                                 else:
                                     value_list.append(buf_cvt_func(alloc_buffer.value))
                             else:
@@ -1905,7 +1922,9 @@ class Cursor:
                     elif ret == SQL_SUCCESS_WITH_INFO:
                         # Means the data is only partial
                         if target_type == SQL_C_BINARY:
-                            raw_data_parts.append(alloc_buffer.raw)
+                            raw_data_parts.append(alloc_buffer.raw[:used_buf_len.value])
+                        elif target_type == SQL_C_WCHAR:
+                            raw_data_parts.append(from_buffer_u(alloc_buffer))
                         else:
                             raw_data_parts.append(alloc_buffer.value)  
          
@@ -1918,7 +1937,8 @@ class Cursor:
                 if raw_data_parts != []:
                     if py_v3:
                         if target_type != SQL_C_BINARY:
-                            raw_value = ''.join(raw_data_parts)
+                            data_parts = [x.decode("utf-8") if type(x) is bytes else x for x in raw_data_parts]
+                            raw_value = ''.join(data_parts)
                         else:
                             raw_value = BLANK_BYTE.join(raw_data_parts)
                     else:
@@ -2026,7 +2046,7 @@ class Cursor:
             
         l_catalog = l_schema = l_table = l_tableType = 0
         
-        if unicode in [type(x) for x in (table, catalog, schema,tableType)]:
+        if any(isinstance(x, unicode) for x in (table, catalog, schema, tableType)):
             string_p = lambda x:wchar_pointer(UCS_buf(x))
             API_f = ODBC_API.SQLTablesW
         else:
@@ -2074,7 +2094,7 @@ class Cursor:
             
         l_catalog = l_schema = l_table = l_column = 0
         
-        if unicode in [type(x) for x in (table, catalog, schema,column)]:
+        if any(isinstance(x, unicode) for x in (table, catalog, schema, column)):
             string_p = lambda x:wchar_pointer(UCS_buf(x))
             API_f = ODBC_API.SQLColumnsW
         else:
@@ -2119,7 +2139,7 @@ class Cursor:
             
         l_catalog = l_schema = l_table = 0
         
-        if unicode in [type(x) for x in (table, catalog, schema)]:
+        if any(isinstance(x, unicode) for x in (table, catalog, schema)):
             string_p = lambda x:wchar_pointer(UCS_buf(x))
             API_f = ODBC_API.SQLPrimaryKeysW
         else:
@@ -2162,7 +2182,7 @@ class Cursor:
             
         l_catalog = l_schema = l_table = l_foreignTable = l_foreignCatalog = l_foreignSchema = 0
         
-        if unicode in [type(x) for x in (table, catalog, schema,foreignTable,foreignCatalog,foreignSchema)]:
+        if any(isinstance(x, unicode) for x in (table, catalog, schema, foreignTable, foreignCatalog, foreignSchema)):
             string_p = lambda x:wchar_pointer(UCS_buf(x))
             API_f = ODBC_API.SQLForeignKeysW
         else:
@@ -2212,7 +2232,7 @@ class Cursor:
             self.close()
             
         l_catalog = l_schema = l_procedure = l_column = 0
-        if unicode in [type(x) for x in (procedure, catalog, schema,column)]:
+        if any(isinstance(x, unicode) for x in (procedure, catalog, schema, column)):
             string_p = lambda x:wchar_pointer(UCS_buf(x))
             API_f = ODBC_API.SQLProcedureColumnsW
         else:
@@ -2256,7 +2276,7 @@ class Cursor:
             
         l_catalog = l_schema = l_procedure = 0
         
-        if unicode in [type(x) for x in (procedure, catalog, schema)]:
+        if any(isinstance(x, unicode) for x in (procedure, catalog, schema)):
             string_p = lambda x:wchar_pointer(UCS_buf(x))
             API_f = ODBC_API.SQLProceduresW
         else:
@@ -2297,7 +2317,7 @@ class Cursor:
             
         l_table = l_catalog = l_schema = 0
         
-        if unicode in [type(x) for x in (table, catalog, schema)]:
+        if any(isinstance(x, unicode) for x in (table, catalog, schema)):
             string_p = lambda x:wchar_pointer(UCS_buf(x))
             API_f = ODBC_API.SQLStatisticsW
         else:
@@ -2418,13 +2438,14 @@ class Connection:
         self.ansi = False
         self.unicode_results = False
         self.dbc_h = ctypes.c_void_p()
-        self.autocommit = autocommit
+        self._autocommit = None
         self.readonly = False
         # the query timeout value
         self.timeout = 0
         # self._cursors = []
         for key, value in list(kargs.items()):
-            connectString = connectString + key + '=' + value + ';'
+            if value is not None:
+                connectString = connectString + key + '=' + value + ';'
         self.connectString = connectString
 
         
@@ -2505,17 +2526,8 @@ class Connection:
         else:
             ret = odbc_func(self.dbc_h, 0, c_connectString, len(self.connectString), None, 0, None, SQL_DRIVER_NOPROMPT)
         check_success(self, ret)
-            
-        
-        # Set the connection's attribute of "autocommit" 
-        #
+
         self.autocommit = autocommit
-        
-        if self.autocommit == True:
-            ret = ODBC_API.SQLSetConnectAttr(self.dbc_h, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER)
-        else:
-            ret = ODBC_API.SQLSetConnectAttr(self.dbc_h, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER)
-        check_success(self, ret)
        
         # Set the connection's attribute of "readonly" 
         #
@@ -2530,6 +2542,20 @@ class Connection:
         self.unicode_results = unicode_results
         self.connected = 1
         self.update_db_special_info()
+
+    @property
+    def autocommit(self):
+        return self._autocommit
+
+    @autocommit.setter
+    def autocommit(self, value):
+        """Set the connection's attribute of "autocommit"""
+        if value:
+            ret = ODBC_API.SQLSetConnectAttr(self.dbc_h, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_ON, SQL_IS_UINTEGER)
+        else:
+            ret = ODBC_API.SQLSetConnectAttr(self.dbc_h, SQL_ATTR_AUTOCOMMIT, SQL_AUTOCOMMIT_OFF, SQL_IS_UINTEGER)
+        check_success(self, ret)
+        self._autocommit = value
         
     def clear_output_converters(self):
         self.output_converter = {}
@@ -2563,11 +2589,11 @@ class Connection:
         self.connected = 1
         
         
-    def cursor(self, row_type_callable=None): 
+    def cursor(self, row_type_callable=None, lowercase=True): 
         #self.settimeout(self.timeout)
         if not self.connected:
             raise ProgrammingError('HY000','Attempt to use a closed connection.')
-        cur = Cursor(self, row_type_callable=row_type_callable) 
+        cur = Cursor(self, row_type_callable=row_type_callable, lowercase=lowercase) 
         # self._cursors.append(cur)
         return cur
 

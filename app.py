@@ -6,7 +6,7 @@ import hashlib
 import secrets
 from datetime import datetime
 import re,os,sys
-import pypyodbc
+from odb import pypyodbc
 
 # import pypyodbc
 
@@ -96,7 +96,6 @@ def kuncijawaban(soal,kode):
         kunci = rows[0]['kunci']
         if rows[0][kunci] == None:
             jawaban = rows[0][kunci.lower()]
-            # print(jawaban)
         else:
             jawaban = rows[0][kunci]
         return (jawaban)
@@ -138,6 +137,6 @@ def kunci():
         return {'status' : 'User tidak valid, silakan lakukan pembelian token di instagram @jokiambis'}
 
 if __name__ == '__main__':
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host="0.0.0.0", port=port)
-    # app.run(debug=True)
+    # port = int(os.environ.get("PORT", 5000))
+    # app.run(host="0.0.0.0", port=port)
+    app.run(debug=True)
