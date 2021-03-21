@@ -21,6 +21,9 @@ path = os.path.dirname(__file__)
 # print(path)
 # path = path.replace("\\","/")
 # os.path.join(path + "/" + "odbc/")
+print(path)
+path= path+".apt/"
+print(path)
 c = os.listdir(path)
 # h = path + "/odbc/"
 print(c)
