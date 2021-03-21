@@ -3,4 +3,5 @@ libltdl-dev
 odbcinst1debian2
 unixodbc
 libiodbc2
+unixodbc
 unixodbc-dev
