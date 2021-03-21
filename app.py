@@ -26,8 +26,8 @@ path1= path+"/.apt/usr/lib/odbc/"
 path2= path+"/.apt/usr/lib/x86_64-linux-gnu/"
 a= os.listdir(path)
 print("before",a)
-shutil.copyfile(path2+"libodbc.so",path)
-shutil.copyfile(path2+"libodbc.so",path1)
+shutil.copyfile(path2+"libodbc.so",path+"/")
+shutil.copyfile(path2+"libodbc.so",path1+"/")
 shutil.copyfile(path2+"libodbc.so",path+"/usr/lib/")
 b= os.listdir(path)
 c = os.listdir(path1)
