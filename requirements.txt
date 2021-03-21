@@ -9,5 +9,4 @@ regex==2020.11.13
 requests==2.25.0
 requests-file==1.5.1
 pathlib
-shutil
 gunicorn==20.0.4
