@@ -422,9 +422,11 @@ if sys.platform in ('win32','cli'):
     SQLWCHAR_SIZE = ctypes.sizeof(ctypes.c_ushort)
 else:
     # Set load the library on linux 
+    ODBC_API = ctypes.cdll.LoadLibrary('libodbc.so')
     try:
         # First try direct loading libodbc.so
         ODBC_API = ctypes.cdll.LoadLibrary('libodbc.so')
+
     except:
         # If direct loading libodbc.so failed
         # We try finding the libodbc.so by using find_library
