@@ -32,8 +32,6 @@ c = os.listdir(path1)
 d = os.listdir(path2)
 # h = path + "/odbc/"
 print("after",b)
-print("odbc",c)
-print("linux-gnu",d)
 # sys.path.append(path + "/odbc/")
 
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
