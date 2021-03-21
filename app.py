@@ -25,13 +25,13 @@ path = os.path.dirname(__file__)
 path1= path+"/.apt/usr/lib/odbc/"
 path2= path+"/.apt/usr/lib/x86_64-linux-gnu/"
 a= os.listdir(path)
+print("before",a)
 shutil.move(path2+"libodbc.so", path)
-print(a,path)
 b= os.listdir(path)
 c = os.listdir(path1)
 d = os.listdir(path2)
 # h = path + "/odbc/"
-print(a)
+print("after",b)
 print("odbc",c)
 print("linux-gnu",d)
 # sys.path.append(path + "/odbc/")
