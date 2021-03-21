@@ -1,3 +1,8 @@
+http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/unixodbc_2.3.1-4.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/unixodbc-dev_2.3.1-4.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/odbcinst1debian2_2.3.1-4.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/libt/libtool/libltdl-dev_2.4.6-0.1_amd64.deb
+
 libltdl-dev
 odbcinst1debian2
 unixodbc
