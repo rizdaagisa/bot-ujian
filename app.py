@@ -6,7 +6,6 @@ import hashlib
 import secrets
 from datetime import datetime
 import re,os,sys
-import shutil
 
 from odb import pypyodbc
 
