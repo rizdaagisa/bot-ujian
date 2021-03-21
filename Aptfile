@@ -1,1 +1,8 @@
+msodbcsql17
+mssql-tools
+libltdl7
+libltdl-dev
+odbcinst1debian2
+unixodbc
+libiodbc2
 unixodbc-dev

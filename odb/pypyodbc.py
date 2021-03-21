@@ -422,11 +422,9 @@ if sys.platform in ('win32','cli'):
     SQLWCHAR_SIZE = ctypes.sizeof(ctypes.c_ushort)
 else:
     # Set load the library on linux 
-    ODBC_API = ctypes.cdll.LoadLibrary('libodbc.so')
     try:
         # First try direct loading libodbc.so
         ODBC_API = ctypes.cdll.LoadLibrary('libodbc.so')
-
     except:
         # If direct loading libodbc.so failed
         # We try finding the libodbc.so by using find_library
@@ -435,7 +433,8 @@ else:
         if library is None:
             # If find_library still can not find the library
             # we try finding it manually from where libodbc.so usually appears
-            lib_paths = ("/usr/lib/libmsodbcsql-17.5.so.2.1","/usr/lib/libodbc.so","/usr/lib/i386-linux-gnu/libodbc.so","/usr/lib/x86_64-linux-gnu/libodbc.so","/usr/lib/libiodbc.dylib","/usr/lib/snowflake/odbc/lib/libSnowflake.so","/usr/lib/libmsodbcsql-17.5.so.2.1","/app/odb/libmsodbcsql-17.5.so.2.1")
+            # lib_paths = ("/usr/lib/libodbc.so","/usr/lib/i386-linux-gnu/libodbc.so","/usr/lib/x86_64-linux-gnu/libodbc.so","/usr/lib/libiodbc.dylib")
+            lib_paths = ("/usr/lib/libodbc.so","/usr/lib/i386-linux-gnu/libodbc.so","/usr/lib/x86_64-linux-gnu/libodbc.so.2","/usr/lib/libiodbc.dylib")
             lib_paths = [path for path in lib_paths if os.path.exists(path)]
             if len(lib_paths) == 0 :
                 raise OdbcNoLibrary('ODBC Library is not found. Is LD_LIBRARY_PATH set?')
