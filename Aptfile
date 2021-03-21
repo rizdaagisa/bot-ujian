@@ -1,13 +1,16 @@
-http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/unixodbc_2.3.1-4.1_amd64.deb
-http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/unixodbc-dev_2.3.1-4.1_amd64.deb
-http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/odbcinst1debian2_2.3.1-4.1_amd64.deb
-http://archive.ubuntu.com/ubuntu/pool/main/libt/libtool/libltdl-dev_2.4.6-0.1_amd64.deb
-
-https://packages.microsoft.com/ubuntu/16.04/mssql-server-2017/pool/main/m/mssql-server/mssql-server_14.0.3381.3-2_amd64.deb
 https://packages.microsoft.com/ubuntu/16.04/prod/pool/main/m/mssql-tools/mssql-tools_17.7.1.1-1_amd64.deb
 https://packages.microsoft.com/ubuntu/16.04/prod/pool/main/m/msodbcsql17/msodbcsql17_17.7.2.1-1_amd64.deb
+
+http://archive.ubuntu.com/ubuntu/pool/main/libt/libtool/libltdl7_2.4.6-0.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/libt/libtool/libltdl-dev_2.4.6-0.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/odbcinst1debian2_2.3.1-4.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/unixodbc_2.3.1-4.1_amd64.deb
+http://archive.ubuntu.com/ubuntu/pool/main/u/unixodbc/unixodbc-dev_2.3.1-4.1_amd64.deb
+
+https://packages.microsoft.com/ubuntu/16.04/mssql-server-2017/pool/main/m/mssql-server/mssql-server_14.0.3381.3-2_amd64.deb
 https://packages.microsoft.com/ubuntu/16.04/prod/pool/main/m/mssql-cli/mssql-cli_1.0.0-1_all.deb
 
+libltdl7
 libltdl-dev
 odbcinst1debian2
 unixodbc
