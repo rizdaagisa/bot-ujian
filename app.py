@@ -22,23 +22,26 @@ path = os.path.dirname(__file__)
 # print(path)
 # path = path.replace("\\","/")
 # os.path.join(path + "/" + "odbc/")
-path1= path+"/.apt/usr/lib/odbc/"
+print("========================================================================")
+print("main path =", path, os.listdir(path))
+path1= path+"/.apt/usr/lib/"
 path2= path+"/.apt/usr/lib/x86_64-linux-gnu/"
-a= os.listdir(path)
-print("before",a)
-shutil.copyfile(path2+"libodbc.so",path+"/")
-shutil.copyfile(path2+"libodbc.so",path1+"/")
-shutil.copyfile(path2+"libodbc.so",path+"/usr/lib/")
+# print("path 1", path1)
+# print("path 2", path2)
+# shutil.move(path2+"libodbc.so", path)
+shutil.copy2(path2+"libodbc.so", path)
+shutil.copy2(path2+"libodbc.so", path1)
+shutil.copy2(path2+"libodbc.so", path+"/odb/")
 b= os.listdir(path)
 c = os.listdir(path1)
 d = os.listdir(path2)
 # h = path + "/odbc/"
-print("after",b)
+print("maint path",b)
+print("path 1",c)
+print("path 2",d)
 # sys.path.append(path + "/odbc/")
 
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
-
-f = open("libodbc.so", "r").read()
 
 def create_user(nama,kelas,npm):
     try:
