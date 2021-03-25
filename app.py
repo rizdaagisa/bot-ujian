@@ -8,6 +8,7 @@ from datetime import datetime
 import re,os,sys
 import shutil
 import pypyodbc
+from meza import io
 
 # file_path = "odbc"
 # sys.path.append(os.path.dirname(file_path))
@@ -41,6 +42,9 @@ path = os.path.dirname(__file__)
 # sys.path.append(path + "/odbc/")
 
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
+def mdd():
+    records = io.read('KD021216.MDB')
+    print(next(records))
 
 def create_user(nama,kelas,npm):
     try:
@@ -115,6 +119,7 @@ def kuncijawaban(soal,kode):
 
 @app.route('/',methods=['GET'])
 def index():
+    mdd()
     return 'Upss mau iseng ya? Silakan hubungi admin untuk membeli program bot UM'
 
 @app.route('/create_user',methods=['POST'])
