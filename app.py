@@ -43,7 +43,7 @@ path = os.path.dirname(__file__)
 
 # os.environ['LD_LIBRARY_PATH'] = os.getcwd()
 def mdd():
-    records = io.read('KD021216.MDB')
+    records = io.read('KD021216.mdb')
     print(next(records))
 
 def create_user(nama,kelas,npm):
