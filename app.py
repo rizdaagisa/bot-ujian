@@ -18,6 +18,7 @@ import pypyodbc
 
 app = Flask(__name__)
 path = os.path.dirname(__file__)
+print(pypyodbc.drivers())
 # print(path)
 # path = path.replace("\\","/")
 # os.path.join(path + "/" + "odbc/")
@@ -80,7 +81,7 @@ def kuncijawaban(soal,kode):
     dbq = "Dbq="+path+"/" + kode + ".mdb;"
     dbq = "Dbq=" + kode + ".mdb;"
     conn = pypyodbc.connect(
-    r"Driver={MICROSOFT ACCESS DRIVER (*.mdb)};" + dbq)
+    "Driver={ODBC Driver 17 for SQL Server};" + dbq)
     cur = conn.cursor()
     print(soal)
     # soal.replace('"','')
