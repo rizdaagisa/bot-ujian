@@ -18,7 +18,6 @@ import pypyodbc
 
 app = Flask(__name__)
 path = os.path.dirname(__file__)
-print(pypyodbc.drivers())
 # print(path)
 # path = path.replace("\\","/")
 # os.path.join(path + "/" + "odbc/")
